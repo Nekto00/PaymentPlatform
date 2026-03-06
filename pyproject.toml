@@ -1,0 +1,26 @@
+[project]
+name = "a-platform-for-publishing-paid-content"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "our ame",email = "you@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django (>=6.0.3,<7.0.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "pillow (>=12.1.1,<13.0.0)",
+    "djangorestframework (>=3.16.1,<4.0.0)",
+    "djangorestframework-simplejwt (>=5.5.1,<6.0.0)",
+    "stripe (>=14.4.0,<15.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)",
+    "coverage (>=7.13.4,<8.0.0)",
+    "django-debug-toolbar (>=6.2.0,<7.0.0)",
+    "gunicorn (>=25.1.0,<26.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
