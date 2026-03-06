@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Добро пожаловать!{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded-lg m-3">
+    <h1 class="display-4">Добро пожаловать на Платформу контента!</h1>
+    <p class="lead">Делитесь своим контентом и зарабатывайте. Получайте доступ к премиум-материалам других авторов.</p>
+    <hr class="my-4">
+    <p>Начните прямо сейчас - зарегистрируйтесь или просматривайте бесплатный контент.</p>
+    <div class="mt-4">
+        <a class="btn btn-primary btn-lg" href="{% url 'content:post_list' %}" role="button">
+            <i class="fas fa-newspaper"></i> Смотреть контент
+        </a>
+        {% if not user.is_authenticated %}
+            <a class="btn btn-success btn-lg" href="{% url 'accounts:register' %}" role="button">
+                <i class="fas fa-user-plus"></i> Зарегистрироваться
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-lock-open text-primary" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">Бесплатный контент</h5>
+                <p class="card-text">Доступ к бесплатным материалам без регистрации. Читайте и делитесь общедоступными постами.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-crown text-warning" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">Премиум контент</h5>
+                <p class="card-text">Получите доступ к эксклюзивным платным материалам с разовой подпиской.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-money-bill-wave text-success" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">Зарабатывайте</h5>
+                <p class="card-text">Создавайте и публикуйте платный контент. Зарабатывайте на своих знаниях и опыте.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Как это работает</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="display-1 text-primary">1</div>
+                        <h5>Регистрация</h5>
+                        <p>Зарегистрируйтесь по номеру телефона</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="display-1 text-primary">2</div>
+                        <h5>Создание контента</h5>
+                        <p>Публикуйте бесплатные или платные посты</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="display-1 text-primary">3</div>
+                        <h5>Подписка</h5>
+                        <p>Оформите разовую подписку для доступа к премиум-контенту</p>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="display-1 text-primary">4</div>
+                        <h5>Доход</h5>
+                        <p>Получайте оплату за свои материалы</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
