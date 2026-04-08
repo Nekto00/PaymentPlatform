@@ -1,4 +1,4 @@
-# Платформа для выкладывания плаьного контента - Django Project
+# Платформа для выкладывания платного контента - Django Project
 
 Платформа для публикации платного контента с интеграцией Stripe и аутентификацией по номеру телефона.
 
@@ -32,9 +32,45 @@
 - PostgreSQL (если выполняется локально)
 - Stripe account (для платежей)
 
-### Настройка среды
+## Быстрый старт
 
-1. Клонировать репозиторий:
+### Локальный запуск (без Docker)
+
+# 1. Клонируйте репозиторий
 ```bash
-git clone https://github.com/yourusername/a_web_application_for_posting_paid_content.git
-cd a_web_application_for_posting_paid_content
+git clone https://github.com/ваш-аккаунт/payment-platform.git
+cd payment-platform
+```
+
+# 2. Создайте виртуальное окружение
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate    # Windows
+```
+
+# 3. Установите зависимости
+```bash
+pip install -r requirements.txt
+```
+
+# 4. Создайте файл .env (скопируйте из примера)
+```bash
+cp .env.example .env
+# Отредактируйте .env — добавьте свои Stripe ключи
+```
+
+# 5. Выполните миграции
+```bash
+python manage.py migrate
+```
+
+# 6. Создайте суперпользователя (администратора)
+```bash
+python manage.py createsuperuser
+```
+
+# 7. Запустите сервер
+```bash
+python manage.py runserver
+```
