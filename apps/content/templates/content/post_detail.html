@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - Платформа контента{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Контент поста -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">{{ post.title }}</h2>
+                <div class="d-flex align-items-center gap-2">
+                    {% if post.status == 'draft' %}
+                        <span class="badge bg-warning">Черновик</span>
+                    {% elif post.status == 'archived' %}
+                        <span class="badge bg-secondary">В архиве</span>
+                    {% elif post.status == 'published' %}
+                        <span class="badge bg-success">Опубликован</span>
+                    {% endif %}
+
+                    {% if post.is_paid %}
+                        <span class="badge bg-warning">По подписке</span>
+                    {% else %}
+                        <span class="badge bg-info">Бесплатно</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                {% if post.is_paid and not has_access %}
+                    <!-- Блок для платного контента без доступа -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-lock fa-4x text-warning mb-3"></i>
+                        <h3>Этот контент доступен только по подписке</h3>
+                        <p class="lead mb-4">{{ post.excerpt|default:post.content|truncatewords:50 }}</p>
+
+                        {% if not user.is_authenticated %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="alert-link">Войдите</a>
+                                или
+                                <a href="{% url 'accounts:register' %}" class="alert-link">зарегистрируйтесь</a>
+                                , чтобы оформить подписку
+                            </div>
+                        {% else %}
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-crown text-warning"></i>
+                                        Премиум подписка
+                                    </h5>
+                                    <p class="card-text display-6 text-warning">$15.00/мес</p>
+                                    <a href="{% url 'payments:create' %}" class="btn btn-warning btn-lg">
+                                        <i class="fas fa-crown"></i> Оформить подписку
+                                    </a>
+                                    <p class="text-muted small mt-2">
+                                        Доступ ко всем платным материалам на 30 дней
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <!-- Полное содержание поста для тех, у кого есть доступ -->
+                    <div class="post-content">
+                        {{ post.content|linebreaks }}
+                    </div>
+
+                    {% if post.is_paid and has_access %}
+                        <div class="alert alert-success mt-3">
+                            <i class="fas fa-check-circle"></i>
+                            Спасибо за подписку! Вы видите этот премиум контент.
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        <i class="fas fa-user"></i> {{ post.author.phone_number }} |
+                        <i class="fas fa-calendar"></i> {{ post.created_at|date:"d.m.Y" }} |
+                        <i class="fas fa-eye"></i> {{ post.views_count }} просмотров
+                    </div>
+
+                    {% if user.is_authenticated and user == post.author %}
+                        <div class="btn-group">
+                            <a href="{% url 'content:post_update' post.slug %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Редактировать
+                            </a>
+                            {% if post.status == 'published' %}
+                                <a href="{% url 'content:post_archive' post.slug %}"
+                                   class="btn btn-sm btn-secondary"
+                                   onclick="return confirm('Отправить пост в архив?')">
+                                    <i class="fas fa-archive"></i> В архив
+                                </a>
+                            {% elif post.status == 'draft' %}
+                                <a href="{% url 'content:post_publish' post.slug %}"
+                                   class="btn btn-sm btn-success"
+                                   onclick="return confirm('Опубликовать пост?')">
+                                    <i class="fas fa-check"></i> Опубликовать
+                                </a>
+                                <a href="{% url 'content:post_archive' post.slug %}"
+                                   class="btn btn-sm btn-secondary"
+                                   onclick="return confirm('Отправить пост в архив?')">
+                                    <i class="fas fa-archive"></i> В архив
+                                </a>
+                            {% elif post.status == 'archived' %}
+                                <a href="{% url 'content:post_publish' post.slug %}"
+                                   class="btn btn-sm btn-success"
+                                   onclick="return confirm('Восстановить и опубликовать?')">
+                                    <i class="fas fa-undo"></i> Восстановить
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Комментарии -->
+        {% if has_access %}
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-comments"></i> Комментарии ({{ comments.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                        <form method="post" class="mb-4">
+                            {% csrf_token %}
+                            {{ comment_form.as_p }}
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Отправить комментарий
+                            </button>
+                        </form>
+                    {% endif %}
+
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <div class="comment mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ comment.user.phone_number }}</strong>
+                                    <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                                </div>
+                                <p class="mt-2">{{ comment.content }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Пока нет комментариев. Будьте первым!</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Боковая панель -->
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Информация</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><strong>Категория:</strong> {{ post.category.name|default:"Без категории" }}</li>
+                    <li><strong>Доступ:</strong>
+                        {% if post.is_paid %}
+                            <span class="badge bg-warning">Только по подписке</span>
+                        {% else %}
+                            <span class="badge bg-info">Бесплатно для всех</span>
+                        {% endif %}
+                    </li>
+                    <li><strong>Автор:</strong> {{ post.author.phone_number }}</li>
+                    <li><strong>Дата:</strong> {{ post.created_at|date:"d.m.Y" }}</li>
+                    <li><strong>Статус:</strong>
+                        {% if post.status == 'draft' %}
+                            <span class="badge bg-warning">Черновик</span>
+                        {% elif post.status == 'archived' %}
+                            <span class="badge bg-secondary">В архиве</span>
+                        {% elif post.status == 'published' %}
+                            <span class="badge bg-success">Опубликован</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Блок подписки -->
+        {% if user.is_authenticated and not user.has_paid_subscription %}
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-white">
+                <h5 class="mb-0"><i class="fas fa-crown"></i> Премиум доступ</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="h4 text-warning">$15.00</p>
+                <p>на 30 дней</p>
+                <a href="{% url 'payments:create' %}" class="btn btn-warning w-100">
+                    <i class="fas fa-crown"></i> Оформить подписку
+                </a>
+                <small class="text-muted d-block mt-2">
+                    Доступ ко всем платным материалам
+                </small>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Анимация для кнопок
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.transition = 'transform 0.3s';
+            });
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

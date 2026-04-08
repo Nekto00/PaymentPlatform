@@ -1,0 +1,75 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="/content/">
+            <i class="fas fa-newspaper"></i> Платформа контента
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/content/">
+                        <i class="fas fa-home"></i> Главная
+                    </a>
+                </li>
+                <!-- Используем request.user вместо user -->
+                {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/content/post/create/">
+                        <i class="fas fa-plus-circle"></i> Создать пост
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i> {{ user.phone_number }}
+                        {% if user.has_paid_subscription %}
+                            <span class="badge bg-success">Премиум</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Мой профиль</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                            <i class="fas fa-id-card"></i> Профиль
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'payments:history' %}">
+                            <i class="fas fa-history"></i> История платежей
+                        </a></li>
+
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Мои посты</h6></li>
+                        <li><a class="dropdown-item" href="{% url 'content:post_drafts' %}">
+                            <i class="fas fa-pencil-alt text-warning"></i> Черновики
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'content:post_archived' %}">
+                            <i class="fas fa-archive text-secondary"></i> Архив
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'content:post_create' %}">
+                            <i class="fas fa-plus-circle text-success"></i> Создать пост
+                        </a></li>
+
+                        {% if not user.has_paid_subscription %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-success" href="{% url 'payments:create' %}">
+                                <i class="fas fa-crown"></i> Купить подписку
+                            </a></li>
+                        {% endif %}
+
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Выйти
+                        </a></li>
+                    </ul>
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

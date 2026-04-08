@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:15
+    container_name: payment_db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=payment_platform
+      - POSTGRES_USER=payment_user
+      - POSTGRES_PASSWORD=payment_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payment_user -d payment_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    container_name: payment_web
+    restart: unless-stopped
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_NAME=payment_platform
+      - DB_USER=payment_user
+      - DB_PASSWORD=payment_password
+      - DB_HOST=db
+      - DB_PORT=5432
+
+  stripe-cli:
+    image: stripe/stripe-cli
+    container_name: payment_stripe
+    command: listen --forward-to web:8000/payments/webhook/
+    env_file:
+      - .env
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

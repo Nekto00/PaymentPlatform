@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Оплата успешна{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card text-center">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-check-circle"></i> Оплата прошла успешно!</h4>
+            </div>
+            <div class="card-body">
+                <i class="fas fa-crown text-warning" style="font-size: 5rem;"></i>
+
+                <h3 class="mt-3">Спасибо за покупку!</h3>
+
+                <p class="lead">
+                    Теперь у вас есть доступ ко всем премиум материалам.
+                </p>
+
+                <p>
+                    Ваша подписка действует 30 дней.
+                </p>
+
+                <div class="mt-4">
+                    <a href="{% url 'content:post_list' %}" class="btn btn-primary">
+                        <i class="fas fa-newspaper"></i> Смотреть контент
+                    </a>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                        <i class="fas fa-user"></i> Профиль
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

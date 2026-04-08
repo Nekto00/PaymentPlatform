@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post_type }} - Платформа контента{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas {{ post_type_icon }} text-{{ post_type_color }}"></i>
+            {{ post_type }}
+        </h2>
+        <a href="{% url 'content:post_create' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Создать новый пост
+        </a>
+    </div>
+
+    {% if page_obj %}
+        <!-- Список постов -->
+        <div class="row">
+            {% for post in page_obj %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-{{ post_type_color }} text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas {{ post_type_icon }}"></i>
+                                {{ post.title|truncatechars:50 }}
+                            </h5>
+                            <small>{{ post.created_at|date:"d.m.Y H:i" }}</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                {{ post.excerpt|default:post.content|truncatewords:30 }}
+                            </p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="text-muted small">
+                                    <i class="fas fa-folder"></i> {{ post.category.name|default:"Без категории" }}
+                                    {% if post.is_paid %}
+                                        <span class="badge bg-warning ms-2">По подписке</span>
+                                    {% endif %}
+                                </div>
+                                <div class="btn-group">
+                                    {% if post.slug %}  <!-- Проверяем наличие slug -->
+                                        {% if post_type == 'Черновики' %}
+                                            <a href="{% url 'content:post_publish' post.slug %}"
+                                               class="btn btn-sm btn-success"
+                                               onclick="return confirm('Опубликовать этот пост?')">
+                                                <i class="fas fa-check"></i> Опубликовать
+                                            </a>
+                                        {% endif %}
+
+                                        <a href="{% url 'content:post_detail' post.slug %}"
+                                           class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i> Просмотр
+                                        </a>
+
+                                        <a href="{% url 'content:post_update' post.slug %}"
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> Ред.
+                                        </a>
+
+                                        {% if post_type == 'Архив' %}
+                                            <a href="{% url 'content:post_publish' post.slug %}"
+                                               class="btn btn-sm btn-success"
+                                               onclick="return confirm('Восстановить из архива?')">
+                                                <i class="fas fa-undo"></i> Восстановить
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'content:post_archive' post.slug %}"
+                                               class="btn btn-sm btn-secondary"
+                                               onclick="return confirm('Отправить в архив?')">
+                                                <i class="fas fa-archive"></i> В архив
+                                            </a>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-danger">Ошибка: нет slug</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted small">
+                            <div class="d-flex justify-content-between">
+                                <span>
+                                    <i class="fas fa-eye"></i> {{ post.views_count }} просмотров
+                                </span>
+                                <span>
+                                    <i class="fas fa-clock"></i>
+                                    {% if post.updated_at > post.created_at %}
+                                        Обновлен: {{ post.updated_at|date:"d.m.Y" }}
+                                    {% else %}
+                                        Создан: {{ post.created_at|date:"d.m.Y" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Навигация по страницам" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="fas fa-chevron-left"></i> Предыдущая
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                Следующая <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- Пустой список -->
+        <div class="text-center py-5">
+            <i class="fas {{ post_type_icon }} fa-4x text-{{ post_type_color }} mb-3"></i>
+            <h3 class="text-{{ post_type_color }}">{{ post_type|title }} пуст</h3>
+            <p class="lead text-muted">{{ empty_message }}</p>
+            <a href="{% url 'content:post_create' %}" class="btn btn-primary btn-lg mt-3">
+                <i class="fas fa-plus-circle"></i> Создать новый пост
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.transition = 'transform 0.3s, box-shadow 0.3s';
+                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+            });
+        });
+    });
+</script>
+{% endblock %}

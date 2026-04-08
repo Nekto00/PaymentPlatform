@@ -1,0 +1,42 @@
+<footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5><i class="fas fa-newspaper"></i> Платформа контента</h5>
+                <p>Публикуйте и получайте доступ к платному контенту.</p>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fas fa-link"></i> Быстрые ссылки</h5>
+                <ul class="list-unstyled">
+                    <li><a href="/content/" class="text-white-50">Главная</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="/accounts/profile/" class="text-white-50">Профиль</a></li>
+                        <li><a href="/content/post/create/" class="text-white-50">Создать пост</a></li>
+                        <li><a href="/payments/history/" class="text-white-50">История платежей</a></li>
+                    {% else %}
+                        <li><a href="/accounts/login/" class="text-white-50">Вход</a></li>
+                        <li><a href="/accounts/register/" class="text-white-50">Регистрация</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5><i class="fas fa-address-card"></i> Контакты</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-envelope"></i> support@platforma.ru</li>
+                    <li><i class="fas fa-phone"></i> 8 (800) 123-45-67</li>
+                    <li><i class="fas fa-clock"></i> Круглосуточно</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="bg-secondary">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; {% now "Y" %} Платформа контента. Все права защищены.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="#" class="text-white-50 me-3">Политика конфиденциальности</a>
+                <a href="#" class="text-white-50">Условия использования</a>
+            </div>
+        </div>
+    </div>
+</footer>

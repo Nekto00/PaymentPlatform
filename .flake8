@@ -1,0 +1,33 @@
+[flake8]
+max-line-length = 119
+max-complexity = 10
+exclude =
+    .git,
+    __pycache__,
+    build,
+    dist,
+    migrations,
+    venv,
+    env,
+    .venv,
+    .env,
+    .tox,
+    *.egg-info,
+    .pytest_cache,
+    .mypy_cache,
+    .vscode,
+    .idea
+ignore =
+    # E203 - пробелы вокруг срезов (не соответствует PEP8)
+    E203,
+    # W503 - перенос строки после бинарного оператора (противоречит W504)
+    W503,
+    # E501 - длинные строки (проверяем отдельно через max-line-length)
+    # E731 - lambda присваивание (если используете функциональный стиль)
+    # E402 - импорты не в начале (если нужно)
+extend-ignore =
+    # Дополнительные игнорируемые правила
+per-file-ignores =
+    # Игнорировать определенные правила в конкретных файлах
+    tests/*: S101,S104
+    */__init__.py: F401
